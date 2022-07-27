@@ -9,9 +9,9 @@ py.init()
 WIDTH=650
 HEIGHT=750
 background_col="grey"
-rows=8
-columns=8
-bombs=8
+rows=15
+columns=15
+bombs=15
 nr_font=py.font.SysFont('trebuchetms',20)
 green=67, 115, 30
 nrs_col={1:"black",2:green,3:"blue",4:"purple", 5:"pink", 6:"orange",7:"red",8:"pink"}
@@ -19,12 +19,16 @@ covered_col=85, 87, 84
 size=WIDTH/rows
 flag_color=209, 145, 36
 bomb_color=173, 42, 42
-window=py.display.set_mode((WIDTH,HEIGHT))
+yes_col=152, 173, 127
+no_col=158, 72, 55
+window=py.display.set_mode((WIDTH,HEIGHT),py.RESIZABLE)
 py.display.set_caption("Be the best MINESWEEPER!")
 game_running=True
 statement_font=py.font.SysFont('trebuchetms',30)
 timer_font=py.font.SysFont("trebuchetms",15)
+button_font=py.font.SysFont("trebuchetms",40)
 dupa=3
+losen=True
 
 
 def neighbour_positions(row,column,rows, columns):
@@ -139,23 +143,141 @@ def uncover_post_click(row,column,place,covered_place):
 
             clicked.add((r,c))
 
-def player_lose(window,text):
-    text=statement_font.render(text,1,bomb_color)
-    window.blit(text,(WIDTH/2-text.get_width()/2,HEIGHT/2-text.get_height()/2))
-    py.display.update()
+def player_lose(window,losen):
+    global game_running
 
-def player_win(window, text_win):
-    text_win=statement_font.render(text,1,bomb_color)
-    window.blit(text,(WIDTH/2-text.get_width()/2,HEIGHT/2-text.get_height()/2))
+    game_running=False
+    print(losen)
+    text1=statement_font.render("You loose :(...",True,bomb_color)
+    text2=statement_font.render("You win! :)",True,bomb_color)
+    window.blit(text1,(WIDTH/2-text1.get_width()/2,HEIGHT/2-text1.get_height()/2))
+    window.blit(text2, (WIDTH / 2 - text2.get_width() / 2, HEIGHT / 2 - text2.get_height() / 2))
+    py.draw.rect(window, "grey", (90,90,470,300))
+    text_play_again = button_font.render("Do you wanna play again?", True, "black")
+    py.draw.rect(window,yes_col,(120,270,180,90))
+    py.draw.rect(window,no_col,(350,270,180,90))
+    text_yes=button_font.render("Yes :)", True, "black")
+    text_no=button_font.render("No :(", True, "black")
+    if losen==True:
+        window.blit(text1,(WIDTH/2-text1.get_width()/2,150))
+    else:
+        window.blit(text2, (WIDTH/2-text1.get_width()/2,150))
+
+    window.blit(text_play_again, ((95,200)))
+    window.blit(text_yes,((160,340-text_yes.get_width()/2,)))
+    window.blit(text_no, ((400, 340 - text_yes.get_width() / 2,)))
+    while game_running==False:
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                game_running = False
+                break
+            if event.type == py.MOUSEBUTTONDOWN:
+                menu_mouse_pos = py.mouse.get_pos()
+
+                c, d = menu_mouse_pos
+                print(c, d)
+                if 120<c< 300 and 270<d<360:
+                    print("yes")
+                    game_running=True
+                    break
+                if 350<c<470 and 270<d<360:
+                    print("no")
+
+                    py.quit()
+
+        py.display.update()
+
+
+def play_again():
+    global game_running
+    text1=statement_font.render("You loose :(...",True,bomb_color)
+    text2 = statement_font.render("You win! :)", True, bomb_color)
+    window.blit(text,((10,10)))
+    py.draw.rect(window, "grey", (90,90,470,300))
+    text_play_again = button_font.render("Do you wanna play again?", True, "black")
+    py.draw.rect(window,yes_col,(120,270,180,90))
+    py.draw.rect(window,no_col,(350,270,180,90))
+    text_yes=button_font.render("Yes :)", True, "black")
+    text_no=button_font.render("No :(", True, "black")
+
+    window.blit(text_yes,((160,340-text_yes.get_width()/2,)))
+    window.blit(text_no, ((400, 340 - text_yes.get_width() / 2,)))
+    while lose == True:
+        game_running=False
+        for event in py.event.get():
+            if event.type == py.QUIT:
+
+                break
+            if event.type == py.MOUSEBUTTONDOWN:
+                menu_mouse_pos = py.mouse.get_pos()
+
+                c, d = menu_mouse_pos
+                print(c, d)
+                if 120<c< 300 and 270<d<360:
+                    print("yes")
+                if 350<c<470 and 270<d<270:
+                    print("no")
+    py.display.update()
+def start_menu():
+    global rows,columns, bombs
+    game_running=False
+    while game_running==False:
+        window.fill(background_col)
+        menu_mouse_pos=py.mouse.get_pos()
+        choice_text=statement_font.render("Choose your game difficulty", True, "black")
+        window.blit(choice_text,((WIDTH/2-choice_text.get_width()/2),HEIGHT/5))
+        beginner_tx=statement_font.render("Beginner",True,"black")
+        medium_tx = statement_font.render("Medium", True, "black")
+        expert_tx = statement_font.render("Expert", True, "black")
+        py.draw.rect(window,(102, 68, 39),(150,230,350,100),border_radius=15)
+        py.draw.rect(window, (115, 112, 109), (150, 360, 350, 100),border_radius=15)
+        py.draw.rect(window, (179, 123, 27), (150, 490, 350, 100),border_radius=15)
+        window.blit(beginner_tx,(int(325-beginner_tx.get_width()/2),int(280-beginner_tx.get_height()/2)))
+        window.blit(medium_tx, (int(325 - beginner_tx.get_width() / 2), int(410 - beginner_tx.get_height() / 2)))
+        window.blit(expert_tx, (int(325 - beginner_tx.get_width() / 2), int(540 - beginner_tx.get_height() / 2)))
+        py.display.update()
+        while game_running == False:
+            for event in py.event.get():
+                if event.type == py.QUIT:
+                    game_running=False
+                    py.quit()
+                if event.type == py.MOUSEBUTTONDOWN:
+                    menu_mouse_pos = py.mouse.get_pos()
+
+                    c,d = menu_mouse_pos
+                    print(c,d)
+                    if 150<c<500 and 230<d<330:
+                        print("beginner")
+                        rows = 10
+                        columns = 10
+                        bombs = 10
+                        game_running=True
+                    if 150 < c < 500 and 360 < d < 460:
+                        print("medium")
+                        game_running = True
+                        rows = 16
+                        columns = 16
+                        bombs = 40
+                    if 150 < c < 500 and 490 < d < 590:
+                        print("expert")
+                        game_running = True
+                        rows = 20
+                        columns = 20
+                        bombs = 75
+        print(rows,columns,bombs)
+        return rows,columns,bombs
+
     py.display.update()
 
 
 def main_game():
+    py.display.update()
+    start_menu()
     game_running=True
     place=mine_grid(rows,columns,bombs)
     covered_place=[[0 for _ in range(columns)]for _ in range(rows)]
     clicks=0
-    lose=False
+    losen=False
     start_timer=0
     win=False
     all_flags=set()
@@ -187,7 +309,7 @@ def main_game():
                     covered_place[row][column]=1
                     if place[row][column]==-1:
                         py.draw.rect(window, bomb_color, (row, column, size, size))
-                        lose=True
+                        losen=True
 
                         flags = bombs
 
@@ -199,7 +321,7 @@ def main_game():
                 elif mouse_press[2]:
                     if covered_place[row][column]==-2:
                         covered_place[row][column]=0
-                        flag_pos.remove((row,column))
+                        all_flags.remove((row,column))
                         flags+=1
                     else:
                         covered_place[row][column]=-2
@@ -213,21 +335,43 @@ def main_game():
 
                         if dupa.issubset(all_flags):
                             win=True
-        if win:
-            preparing_window(window, place, covered_place, actual_time)
-            player_lose(window, "You win!")
+                            losen=False
+                            print(win)
+                            print(losen)
 
-        if lose:
-            preparing_window(window, place, covered_place,actual_time)
-            player_lose(window, "BUM!!!!!!! ... Opsi, try again ...")
-            py.time.delay(3000)
+
+
+        if win:
+            losen=False
+            preparing_window(window, place, covered_place, actual_time)
+            player_lose(window,losen)
+            start_menu()
+            py.time.delay(1000)
+            preparing_window(window, place, covered_place, actual_time)
             place = mine_grid(rows, columns, bombs)
             covered_place = [[0 for _ in range(columns)] for _ in range(rows)]
             clicks = 0
-            lose=False
+            losen = False
+            win=False
+
+        preparing_window(window, place, covered_place, actual_time)
+
+
+        if losen:
+
+            preparing_window(window, place, covered_place,actual_time)
+            player_lose(window,losen)
+            start_menu()
+            py.time.delay(1000)
+            preparing_window(window, place, covered_place, actual_time)
+            place = mine_grid(rows, columns, bombs)
+            covered_place = [[0 for _ in range(columns)] for _ in range(rows)]
+            clicks = 0
+            losen=False
+
         preparing_window(window,place,covered_place,actual_time)
 
-    py.quit()
+
 
 
 
